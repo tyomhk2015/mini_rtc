@@ -14,5 +14,13 @@ WebRTC w/ Web Sockets
   For connection, wss://domain.blah or ws://domain.blah
 </pre>
 * Once connected w/ WSS, the server remembers the connected user, and can send messages prior to the client's request. (No more 1:1 of req and res!)
-* The connection is two-way direction, server can send many signals and at any point. So do the client. (N:N communication)
-* 
+* The connection is two-way direction, server can send many signals and at any point, arbitrarily. So do the client. (N:N communication)
+
+<br>
+<img src="https://blog.scaleway.com/content/images/2021/02/websockets-bigger-4.png" />
+
+**Glossary**
+* Implementation
+<br>
+Following some rules for building something and turn it into code.
+
