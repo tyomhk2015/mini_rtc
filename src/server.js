@@ -1,5 +1,7 @@
 const express = require('express');
+const http = require('http');
 const path = require('path');
+const webSocket = require('ws');
 
 const app = express();
 
@@ -14,6 +16,9 @@ app.get('/', (_, res) => res.render('home'));
 // Redirect to home when accessing to unregistered route.
 app.get('/*', (_, res) => res.redirect('/'));
 
+// Create a server using express.js
+const server = http.createServer(app);
+
 // Turn the server on
-app.listen(9999, () => {console.log('Activated the server.');});
+// app.listen(9999, () => {console.log('Activated the WebSocket server.');});
 
