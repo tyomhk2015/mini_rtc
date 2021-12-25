@@ -19,6 +19,8 @@ WebRTC w/ Web Sockets
 <br>
 <img src="https://blog.scaleway.com/content/images/2021/02/websockets-bigger-4.png" />
 
+* Implementing WebSocket is more similar to adding events at the frontEnd, not like HTTPs.
+
 **Glossary**
 * Implementation
 <br>
