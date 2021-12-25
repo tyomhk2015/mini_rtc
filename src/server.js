@@ -23,6 +23,9 @@ app.get('/*', (_, res) => res.redirect('/'));
 const server = http.createServer(app);
 const webSocketServer = new WebSocket.Server({server});
 
+// Temporary array for storing clients' sockets.
+const sockets = [];
+
 // The 2nd argument of the callback:
 // this: WebSocket.Server =>
 // socket: WebSocket => 
@@ -30,7 +33,10 @@ const webSocketServer = new WebSocket.Server({server});
 //   A mean of sending/receiving messages.
 // request: http.IncomingMessage =>
 webSocketServer.on("connection", (socket) => {
+  // socket: Each client(browser) that is connected to this WebSocket Server.
   console.log("Connected to Browser (WS) ✅");
+
+  sockets.push(socket);
 
   // When the client leaves the server.
   socket.on("close", () => {
@@ -40,6 +46,9 @@ webSocketServer.on("connection", (socket) => {
   // When the client (browser) sends a message to the server.
   socket.on("message", (message) => {
     console.log("From the client (Browser):", message.toString());
+    sockets.forEach((aSocket) => {
+      aSocket.send(message.toString());
+    });
   })
 
   // Send a message to the client (browser).
