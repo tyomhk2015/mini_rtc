@@ -4,6 +4,8 @@
 
 const host = window.location.host; // Get host of the current site.
 const socket = new WebSocket(`ws://${host}`); // socket: Represents a connection to the server.
+const messageform = document.querySelector("form");
+const messageList = document.querySelector("ul");
 
 // When browser is connected to the server.
 socket.addEventListener("open", () => {
@@ -21,6 +23,11 @@ socket.addEventListener("close", () => {
 });
 
 // Send a message to the server.
-setTimeout(() => {
-  socket.send("狂気のにじさんじ！");
-}, 2000);
+messageform.addEventListener("submit", handleSubmit);
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const input = messageform.querySelector("input");
+  socket.send(input.value);
+  input.value = "";
+};
