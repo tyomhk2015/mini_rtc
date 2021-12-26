@@ -1,0 +1,19 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    title MINI RTC (WebSocket)
+  body 
+    header
+      h1 MINI RTC (WebSocket)
+    main 
+      h2 Send a message to the server!
+      form#messageForm(action="")
+        input#nickname(type="text", placeholder="Type nickname.", required) 
+        input#message(type="text", placeholder="Send a message.", required) 
+        button Send
+      ul#messageList
+    script(src="/public/js/app.js")
