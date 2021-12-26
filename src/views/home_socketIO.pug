@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet", href="/public/css/chat.css")
+    title MINI RTC (SocketIO)
+  body 
+    header
+      h1 MINI RTC (SocketIO)
+    main 
+      div#welcome.active
+        h2 Top Page
+        h4 Available rooms 
+        ul#roomList
+        form(action="")
+          span Nickname
+          input#nickname(type="text", placeholder="Enter nickname", required)
+          span Room
+          input#roomName(type="text", placeholder="Room name", required)
+          button Enter
+      div#room
+        h2 In Room
+        form(action="")
+          span Message
+          input#message(type="text", placeholder="Type message", required)
+          button Enter
+        ul#messageList
+    <!-- Loading socket.io and frontend JS -->
+    script(src="/socket.io/socket.io.js")
+    script(src="/public/js/app.js")
