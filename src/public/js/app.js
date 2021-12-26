@@ -1,45 +1,70 @@
 // FrontEnd(or Browser)
 
-// Connect to a WebSocket
+// Connect to the server that uses SocketIO.
+const socket = io();
 
-const host = window.location.host; // Get host of the current site.
-const socket = new WebSocket(`ws://${host}`); // socket: Represents a connection to the server.
-const messageForm = document.querySelector("#messageForm");
-const messageInput = document.querySelector("#message");
-const nicknameInput = document.querySelector("#nickname");
-const messageList = document.querySelector("#messageList");
+// Get DOMs
+const welcomeDOM = document.getElementById("welcome");
+const welcomeForm = welcomeDOM.querySelector("form");
 
-// When browser is connected to the server.
-socket.addEventListener("open", () => {
-  console.log("Connected to Server (WS) ✅");
-});
+const room = document.getElementById("room");
+const roomForm = room.querySelector("form");
+const messageList = room.querySelector("#messageList");
 
-// When server sends something to the connected browser.
-socket.addEventListener("message", (message) => {
-  const messageLine = document.createElement("li");
-  messageLine.innerHTML = message.data;
-  messageList.append(messageLine);
-  console.log("From Server:", message.data);
-});
-
-// When disconnected from the server.
-socket.addEventListener("close", () => {
-  console.log("Disconnected from the server ❌");
-});
-
-// Send a message to the server.
-messageForm.addEventListener("submit", handleSubmit);
-
-function handleSubmit(event) {
+// Create event handlers
+function handleRoomCreation(event) {
   event.preventDefault();
-  const nicknameValue = nicknameInput.value;
-  const messageValue =  messageInput.value;
-  socket.send(makeMessage(nicknameValue,messageValue));
-  messageInput.value = "";
-};
+  const roomNameInput = welcomeForm.querySelector("#roomName");
+  const nicknameInput = welcomeForm.querySelector("#nickname");
+  // emit() Args:
+  // 1st: Event name to invoke.
+  // 2nd: Data (Obj, Str etc)
+  // 3rd: Callback. 
+  //      When the action is a success in the server, the server gives the result signal 'done()' to the front end.
+  socket.emit("enterRoom", {nickname: nicknameInput.value, room_name: roomNameInput.value}, showRoom);
+  roomName = roomNameInput.value;
+  roomNameInput.value = "";
+}
+function handleChatMessage(event) {
+  event.preventDefault();
+  const chatInput = room.querySelector("#message");
+  socket.emit("addMessage", chatInput.value, roomName, () => {
+    addMessage(`YOU: ${chatInput.value}`);
+    chatInput.value = "";
+  });
+}
 
-// Make an object for sending nickname and message
-function makeMessage(nickname, message) {
-  const messageObj = {nickname, message};
-  return JSON.stringify(messageObj);
-};
+// Listen to events. (Frontend)
+welcomeForm.addEventListener("submit", handleRoomCreation);
+roomForm.addEventListener("submit", handleChatMessage);
+
+// Listen to events. (From server)
+socket.on("welcome", (msg) => {
+  addMessage(msg);
+});
+socket.on("addMessage", (msg) => {
+  addMessage(msg);
+});
+socket.on("farewell", (msg) => {
+  addMessage(msg);
+});
+
+// Custom functions
+let roomName; // For showing the name of the room the client is participating.
+
+function showRoom(backendMsg) {
+  // Hide welcome div.
+  welcomeDOM.removeAttribute("class");
+  // Visualize hidden room
+  room.classList.add("active");
+  const roomH2 = room.querySelector("h2");
+  roomH2.innerHTML = roomName.trim().length !== 0 ? `In Room : ${roomName}` : 'In Room'
+  console.log(backendMsg + "\nServer: The room was created successfully.");
+}
+
+function addMessage(msg) {
+  console.log(msg);
+  const messageLine = document.createElement("li");
+  messageLine.innerText = msg;
+  messageList.appendChild(messageLine);
+}
