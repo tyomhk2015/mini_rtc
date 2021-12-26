@@ -6,10 +6,12 @@ const socket = io();
 // Get DOMs
 const welcomeDOM = document.getElementById("welcome");
 const welcomeForm = welcomeDOM.querySelector("form");
+const roomList = welcomeDOM.querySelector("#roomList");
 
 const room = document.getElementById("room");
 const roomForm = room.querySelector("form");
 const messageList = room.querySelector("#messageList");
+const userCount = room.querySelector("h2");
 
 // Create event handlers
 function handleRoomCreation(event) {
@@ -39,32 +41,53 @@ welcomeForm.addEventListener("submit", handleRoomCreation);
 roomForm.addEventListener("submit", handleChatMessage);
 
 // Listen to events. (From server)
-socket.on("welcome", (msg) => {
+socket.on("welcome", (msg, participants) => {
+  // Does not invoke on the same sids at the first time.
+  console.log(participants);
+  updateUsersCount(participants);
   addMessage(msg);
 });
 socket.on("addMessage", (msg) => {
   addMessage(msg);
 });
-socket.on("farewell", (msg) => {
+socket.on("farewell", (msg, participants) => {
+  updateUsersCount(participants);
   addMessage(msg);
+});
+socket.on("roomUpdate", (rooms) => {
+  const subtitle = welcomeDOM.querySelector("h4");
+  subtitle.innerText = `Available rooms: ${rooms.length}`;
+  roomList.textContent = null;
+  rooms.forEach((room) => {
+    updateRooms(room);
+  });
 });
 
 // Custom functions
 let roomName; // For showing the name of the room the client is participating.
 
-function showRoom(backendMsg) {
+function showRoom() {
   // Hide welcome div.
   welcomeDOM.removeAttribute("class");
   // Visualize hidden room
   room.classList.add("active");
   const roomH2 = room.querySelector("h2");
   roomH2.innerHTML = roomName.trim().length !== 0 ? `In Room : ${roomName}` : 'In Room'
-  console.log(backendMsg + "\nServer: The room was created successfully.");
 }
 
 function addMessage(msg) {
-  console.log(msg);
   const messageLine = document.createElement("li");
   messageLine.innerText = msg;
   messageList.appendChild(messageLine);
+}
+
+function updateRooms(room) {
+  const roomLine = document.createElement("li");
+  roomLine.innerText = room;
+  roomList.appendChild(roomLine);
+}
+
+function updateUsersCount(participants) {
+  console.log(participants);
+  userCount.innerHTML = `In Room : ${roomName} (${participants})`;
 }

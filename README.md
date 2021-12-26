@@ -35,3 +35,12 @@ Homepage : https://socket.io/
 * If there are browsers that do not support `WebSocket`, this framework will help those browsers to achieive real-time communication by other methods.
 * Pros: You do not need to implement all the technial features, you need, from scratch.
 <br>E.g) Reconnect to the server when the connection is disconnected.
+
+💡 Adapter
+
+* Resource: https://socket.io/docs/v4/glossary/#adapter
+* Synchronize you RTC applications among the other servers.
+
+<br>
+<img src="https://socket.io/assets/images/mongo-adapter-88a4451b9d19d21c8d92d9a7586df15b.png" />
+<br>
