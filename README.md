@@ -26,3 +26,12 @@ WebRTC w/ Web Sockets
 <br>
 Following some rules for building something and turn it into code.
 
+**Socket IO**
+
+Homepage : https://socket.io/
+
+* Not an implementation of WebSocket.
+* This is a framework/library supporting `real-time`, `bidirectional`, and `event-driven` communication for Front-end and Back-end.
+* If there are browsers that do not support `WebSocket`, this framework will help those browsers to achieive real-time communication by other methods.
+* Pros: You do not need to implement all the technial features, you need, from scratch.
+<br>E.g) Reconnect to the server when the connection is disconnected.
