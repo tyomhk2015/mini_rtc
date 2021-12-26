@@ -45,9 +45,10 @@ webSocketServer.on("connection", (socket) => {
   
   // When the client (browser) sends a message to the server.
   socket.on("message", (message) => {
-    console.log("From the client (Browser):", message.toString());
+    const messageObj = JSON.parse(message);
+    console.log("From the client (Browser):", messageObj);
     sockets.forEach((aSocket) => {
-      aSocket.send(message.toString());
+      aSocket.send(messageObj.nickname + ": " + messageObj.message);
     });
   })
 

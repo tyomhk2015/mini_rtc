@@ -11,8 +11,9 @@ html(lang="en")
       h1 MINI RTC
     main 
       h2 Send a message to the server!
-        form(action="")
-          input(type="text", placeholder="Send a message.", required) 
-          button Send
-        ul
+      form#messageForm(action="")
+        input#nickname(type="text", placeholder="Type nickname.", required) 
+        input#message(type="text", placeholder="Send a message.", required) 
+        button Send
+      ul#messageList
     script(src="/public/js/app.js")

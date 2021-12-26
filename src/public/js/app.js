@@ -4,8 +4,10 @@
 
 const host = window.location.host; // Get host of the current site.
 const socket = new WebSocket(`ws://${host}`); // socket: Represents a connection to the server.
-const messageform = document.querySelector("form");
-const messageList = document.querySelector("ul");
+const messageForm = document.querySelector("#messageForm");
+const messageInput = document.querySelector("#message");
+const nicknameInput = document.querySelector("#nickname");
+const messageList = document.querySelector("#messageList");
 
 // When browser is connected to the server.
 socket.addEventListener("open", () => {
@@ -14,6 +16,9 @@ socket.addEventListener("open", () => {
 
 // When server sends something to the connected browser.
 socket.addEventListener("message", (message) => {
+  const messageLine = document.createElement("li");
+  messageLine.innerHTML = message.data;
+  messageList.append(messageLine);
   console.log("From Server:", message.data);
 });
 
@@ -23,11 +28,18 @@ socket.addEventListener("close", () => {
 });
 
 // Send a message to the server.
-messageform.addEventListener("submit", handleSubmit);
+messageForm.addEventListener("submit", handleSubmit);
 
 function handleSubmit(event) {
   event.preventDefault();
-  const input = messageform.querySelector("input");
-  socket.send(input.value);
-  input.value = "";
+  const nicknameValue = nicknameInput.value;
+  const messageValue =  messageInput.value;
+  socket.send(makeMessage(nicknameValue,messageValue));
+  messageInput.value = "";
+};
+
+// Make an object for sending nickname and message
+function makeMessage(nickname, message) {
+  const messageObj = {nickname, message};
+  return JSON.stringify(messageObj);
 };
