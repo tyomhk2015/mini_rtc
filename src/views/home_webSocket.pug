@@ -14,7 +14,9 @@ html(lang="en")
     main 
       h2 Send a message to the server!
       form#messageForm(action="")
+        span Nickname
         input#nickname(type="text", placeholder="Type nickname.", required) 
+        span Message
         input#message(type="text", placeholder="Send a message.", required) 
         button Send
       ul#messageList
