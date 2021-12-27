@@ -44,3 +44,38 @@ Homepage : https://socket.io/
 <br>
 <img src="https://socket.io/assets/images/mongo-adapter-88a4451b9d19d21c8d92d9a7586df15b.png" />
 <br>
+
+
+**WebRTC**
+
+* Prequisite
+1. Get video/camera from user to show it on the screen.
+2. Mute/Unmute, Camera On/Off, Rear/Front camera mode triggers.
+3. Permission for using media devices must be allowed.
+
+📝 Note
+* If one browser is using the media of the device, camera, the other browser cannot get the information about the device because it is already occupied.
+<pre>
+An Error
+In Chrome & Edge:
+  DOMException: Could not start video source
+
+In FireFox:
+  DOMException: Failed to allocate videosource
+</pre>
+
+* Stream give different tracks, like audio,video, subtitle etc.
+* MediaDevices: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices
+
+💡 Peer-to-Peer (P2P)
+* A system that do not need a central DB, for transmitting audios / videos / text.
+* Your computer, or node, will be a client and a server at the same time.
+* WebRTC allows us to make P2P connections.
+
+<img src="https://www.informatique-mania.com/wp-content/uploads/2020/12/Diferencias-servidor-y-red-P2P.jpg">
+
+<img src="https://melavi.de/wp-content/uploads/2015/08/WebRTC_SimpleP2P.png ">
+
+* The need of a server on P2P system.
+<br>To enable clients to find connection settings for communicating with other clients. (Eg. Browser, Port, IP, Location, OS ... etc)
+
