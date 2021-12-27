@@ -13,7 +13,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // router
 app.use('/public', express.static(__dirname + '/public'));
-app.get('/', (_, res) => res.render('home'));
+app.get('/', (_, res) => res.render('home_webSocket'));
 
 // Redirect to home when accessing to unregistered route.
 app.get('/*', (_, res) => res.redirect('/'));
@@ -33,27 +33,27 @@ const sockets = [];
 //   A mean of sending/receiving messages.
 // request: http.IncomingMessage =>
 webSocketServer.on("connection", (socket) => {
-  // socket: Each client(browser) that is connected to this WebSocket Server.
-  console.log("Connected to Browser (WS) ✅");
-
   sockets.push(socket);
+
+  // A default greeting message and connected to the server.
+  socket.on("open", () => {
+  }).send("Welcome to Noom chat room!<br>Tip: Write nickname and a message to participate the chat.");
 
   // When the client leaves the server.
   socket.on("close", () => {
     console.log("The client left the server ❌");
   });
-  
+
   // When the client (browser) sends a message to the server.
   socket.on("message", (message) => {
     const messageObj = JSON.parse(message);
-    console.log("From the client (Browser):", messageObj);
     sockets.forEach((aSocket) => {
-      aSocket.send(messageObj.nickname + ": " + messageObj.message);
+      // Reduce the workload of server by not broadcasting to myself.
+      if(aSocket !== socket) {
+        aSocket.send(messageObj.nickname + ":  " + messageObj.message);
+      }
     });
-  })
-
-  // Send a message to the client (browser).
-  socket.send("YAGOOのお夢、ホロライブ！");
+  });
 });
 
 // Turn the server on
