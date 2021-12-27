@@ -5,10 +5,12 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet", href="/public/css/chat.css")
     title MINI RTC (WebSocket)
   body 
     header
       h1 MINI RTC (WebSocket)
+      small ※ Does not fully support IE.
     main 
       h2 Send a message to the server!
       form#messageForm(action="")
@@ -16,4 +18,4 @@ html(lang="en")
         input#message(type="text", placeholder="Send a message.", required) 
         button Send
       ul#messageList
-    script(src="/public/js/app.js")
+    script(src="/public/js/app_webSocket.js")
