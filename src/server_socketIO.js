@@ -16,7 +16,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Router
 app.use('/public', express.static(__dirname + '/public'));
-app.get('/', (_, res) => res.render('home'));
+app.get('/', (_, res) => res.render('home_socketIO'));
 app.get('/*', (_, res) => res.redirect('/')); // Redirect to home when accessing to unregistered route.
 
 // Set server
