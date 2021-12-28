@@ -39,18 +39,14 @@ ul {
   color: #AAA;
 }
 
-#room {
+#room,
+#welcome,
+#streamWrapper {
   display: none;
 }
 
-#room.active {
+#room.active,
+#welcome.active,
+#streamWrapper.active {
   display: block;
-}
-
-#welcome.active {
-  display: block;
-}
-
-#welcome {
-  display: none;
 }
