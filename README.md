@@ -89,3 +89,19 @@ In FireFox:
 <br> https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Session_lifetime
 
 
+🛠 **Troubleshooting**
+<br>
+❌ Problem
+
+* Safari browser was not showing peer's camera in the video tag.
+
+<br>
+🔎 Reason
+
+* 'addstream' event of `RTCPeerConnection` was deprecated.
+
+<br>
+✅ Solution
+
+* Added the event listener `track`, instead of `addstream`, on the `RTCPeerConnection` object.
+* In the `srcObject` of video tag DOM, put `Mediastream`.

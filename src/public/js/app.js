@@ -179,6 +179,6 @@ function handleICE(data) {
 }
 
 function handleAddStream(data) {
-  // Attach peer B's stream to the video tag
+  // Attach 'Mediastream' of peer B to the video tag.
   peerStream.srcObject = data.streams[0]; // https://huchu.link/CYisHDJ
 }
