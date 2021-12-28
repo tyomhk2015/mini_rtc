@@ -31,5 +31,32 @@ instrument(socketIOserver, {
   auth: false
 });
 
+socketIOserver.on("connection", (socket) => {
+
+  socket.on("enterRoom", (roomName) => {
+    // Peer B, or initial Host
+    socket.join(roomName);
+
+    // Peer A, participating room members.
+    socket.to(roomName).emit("greeting", `Server: Someone joined the room, '${roomName}'.`);
+  });
+
+  // Signaling
+  socket.on("offer", (offer, roomName) => {
+    // Peer A => Peer B
+    socket.to(roomName).emit("offer", offer);
+  });
+
+  socket.on("answer", (answer, roomName) => {
+    // Peer B => Peer A
+    socket.to(roomName).emit("answer", answer);
+  });
+
+  socket.on("ice", (icecandidate, roomName) => {
+    // Peer B <=> Peer A
+    socket.to(roomName).emit("ice", icecandidate);
+  });
+});
+
 // Turn the server on
 httpServer.listen(9999, () => {console.log('Activated the WebRTC server.');});
