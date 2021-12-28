@@ -76,6 +76,16 @@ In FireFox:
 
 <img src="https://melavi.de/wp-content/uploads/2015/08/WebRTC_SimpleP2P.png ">
 
-* The need of a server on P2P system.
+* The need of a server on P2P system; signaling.
 <br>To enable clients to find connection settings for communicating with other clients. (Eg. Browser, Port, IP, Location, OS ... etc)
+
+💡 Steps for building webRTC
+
+<img src="https://miro.medium.com/max/1600/1*hQHzaT-JB1Wx3y0qtQX8Kw.png" style="background: white;">
+
+* Negotiating the mean of communcating with ICEcandidate, between peers, is mandatory.
+
+💡 WebRTC lifecycle
+<br> https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Session_lifetime
+
 
