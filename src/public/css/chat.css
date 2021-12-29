@@ -4,11 +4,6 @@ ul {
   list-style-type: none;
 }
 
-.mine {
-  color: rgb(63, 148, 63);
-  font-weight: bold;
-}
-
 #messageList {
   border: 1px solid rgb(85, 85, 85);
   border-radius: 5px;
@@ -27,16 +22,8 @@ ul {
   font-weight: normal;
 }
 
-#messageList > li:not(:last-child)::before {
-  content:"・ ";
-}
-
 #messageList > li.mine::before {
-  content:"▶ ";
-}
-
-#messageList > li:last-child {
-  color: #AAA;
+  content: "▶ ";
 }
 
 #room,
@@ -49,4 +36,32 @@ ul {
 #welcome.active,
 #streamWrapper.active {
   display: block;
+}
+
+#roomName,
+#message {
+  width: 440px;
+}
+
+.mine {
+  color: rgb(63, 148, 63);
+  font-weight: bold;
+}
+
+.leave,
+.join {
+  background-color: salmon;
+  border: 2px solid salmon;
+  color: white;
+  margin-left: 20px;
+}
+
+.join {
+  background-color: teal;
+  border: 2px solid teal;
+}
+
+.notFound {
+  color: red;
+  font-weight: bold;
 }
