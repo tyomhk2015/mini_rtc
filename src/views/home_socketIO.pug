@@ -17,17 +17,23 @@ html(lang="en")
         ul#roomList
         form(action="")
           span Nickname
-          input#nickname(type="text", placeholder="Enter nickname", required)
+          input#topNickname(type="text", placeholder="Enter nickname", required)
           span Room
-          input#roomName(type="text", placeholder="Room name", required)
-          button Enter
+          input#roomName(type="text", placeholder="Enter a room name", required)
+          div.btnWrapper
+            button.create(type="button") Create
+            button.join(type="button") Join
       div#room
         h2 In Room
+        ul#messageList
         form(action="")
+          span Nickname
+          input#roomNickname(type="text", placeholder="Type nickname.", required) 
           span Message
           input#message(type="text", placeholder="Type message", required)
-          button Enter
-        ul#messageList
+          div.btnWrapper
+            button(type="submit") Enter
+            button.leave(type="button") Leave
     <!-- Loading socket.io and frontend JS -->
     script(src="/socket.io/socket.io.js")
     script(src="/public/js/app_socketIO.js")
