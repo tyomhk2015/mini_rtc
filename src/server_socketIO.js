@@ -36,10 +36,15 @@ socketIOserver.on("connection", (socket) => {
   socket["nickname"] = "Anon";
 
   // Get information about available rooms.
-  socketIOserver.sockets.emit("roomUpdate", findPublicRooms());
+  socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
 
   // Add an event listener that is invoked in the front end.
-  socket.on("enterRoom", (payload, done) => {
+  socket.on("createRoom", (payload, done) => {
+    const isRoomExist = findRoom(payload.room_name);
+    if (isRoomExist) {
+      socket.emit("roomExist", payload.room_name);
+      return;
+    }
     socket["nickname"] = payload.nickname;
     // Server has a private room ready for server and a client as default, id.
     // The room names after the id is other rooms that the client is currently participating.
@@ -47,46 +52,67 @@ socketIOserver.on("connection", (socket) => {
 
     // console.log(socket.rooms); // Check the participating rooms.
     done();
-
-    // Tell the people in the room that this new client has joined the room.
-    socket.to(payload.room_name).emit("welcome", `${socket.nickname} JOINED ${payload.room_name}`, countParticipants(payload.room_name));
-
+    
     // Notify all sockets that a new room has been created.
-    socketIOserver.sockets.emit("roomUpdate", findPublicRooms());
+    socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
+  });
+ 
+  // Join a room
+  socket.on("joinRoom", (payload, done) => {
+    const isRoomExist = findRoom(payload.room_name);
+    if (!isRoomExist) {
+      socket.emit("roomNotFound", payload.room_name);
+      return;
+    }
+    socket["nickname"] = payload.nickname;
+    socket.join(payload.room_name);
+    done();
+    // Tell the people in the room that this new client has joined the room.
+    const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${payload.nickname} joined the room, ${payload.room_name}.`}
+    socket.to(payload.room_name).emit("welcome", sendingPayload, countParticipants(payload.room_name));
   });
 
   // Send message to the room.
-  socket.on("addMessage", (message, roomName, done) => {
-    socket.to(roomName).emit("addMessage", `${socket.nickname}: ${message}`);
-    done();
+  socket.on("addMessage", (payload, roomName, done) => {
+    socket["nickname"] = payload.nickname;
+    const sendingPayload = {nickname: socket.nickname, message: payload.message};
+    socket.to(roomName).emit("addMessage", sendingPayload);
+    done(showPublicRooms());
+  });
+
+  // Leave the room
+  socket.on("leave", (roomName, nickname) => {
+    socket["nickname"] = nickname;
+    console.log(socket.id, 'left the room,',roomName);
+    socket.leave(roomName);
+    socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
   });
 
   // Tell the rooms, where this client is participating at, that the client has been disconnected.
   socket.on("disconnecting", () => {
+    const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${socket.nickname} left the chat.`};
     socket.rooms.forEach((roomID) => {
-      socket.to(roomID).emit("farewell", `${socket.nickname} left ${roomID}.`, countParticipants(roomID) - 1);
+      socket.to(roomID).emit("farewell", sendingPayload, countParticipants(roomID) - 1);
     });
   });
 
   socket.on("disconnect", () => {
     // Notify all sockets that the public room has been destroyed, done by socketIO.
-    socketIOserver.sockets.emit("roomUpdate", findPublicRooms());
+    socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
   });
 });
 
-// Turn the server on
-httpServer.listen(9999, () => {console.log('Activated the Server server.');});
 
 // Custom functions
-function findPublicRooms() {
+function showPublicRooms() {
   const {
     sockets: {
       adapter: { sids, rooms},
     },
   } = socketIOserver;
-
+  
   const publicRooms = [];
-
+  
   rooms.forEach((_, key) => {
     if (sids.get(key) === undefined) {
       publicRooms.push(key);
@@ -96,6 +122,18 @@ function findPublicRooms() {
 }
 
 function countParticipants(roomName) {
-  console.log(socketIOserver.sockets.adapter.rooms.get(roomName)?.size);
   return socketIOserver.sockets.adapter.rooms.get(roomName)?.size;
 }
+function findRoom(roomName) {
+  const {
+    sockets: {
+      adapter: {rooms},
+    },
+  } = socketIOserver;
+
+  const isRoomExist = rooms.get(roomName) !== undefined;
+  return isRoomExist
+} 
+
+// Turn the server on
+httpServer.listen(9999, () => {console.log('Activated the Server server.');});
