@@ -10,7 +10,7 @@ const roomList = welcomeDOM.querySelector("#roomList");
 const roomNameInput = welcomeForm.querySelector("#roomName");
 const topPageNickname = welcomeForm.querySelector("#topNickname");
 const createBtn = welcomeForm.querySelector(".create");
-const joinBtn = welcomeForm.querySelector(".join");
+const searchJoinBtn = welcomeForm.querySelector(".searchJoin");
 
 const room = document.getElementById("room");
 const roomForm = room.querySelector("form");
@@ -22,15 +22,19 @@ const leaveBtn = room.querySelector(".leave");
 
 const nicknameInputs = [topPageNickname, roomPageNicknameInput];
 
+const notice = document.getElementById("notice");
+const closeBtn = notice.querySelector('.closeBtn');
+
 // Create event handlers
 function handleRoomCreation() {
   const validatePassed = validateForm('welcome');
   if(!validatePassed) return false;
 
-  socket.emit("createRoom", {nickname: topPageNickname.value, room_name: roomNameInput.value}, showRoom);
+  const payload = {nickname: topPageNickname.value, room_name: roomNameInput.value};
+  socket.emit("createRoom", payload, showRoom);
   roomName = roomNameInput.value;
 }
-function handleRoomJoin() {
+function handleSearchedRoomJoin() {
   const validatePassed = validateForm('welcome');
   if(!validatePassed) return false;
 
@@ -68,19 +72,28 @@ function leaveRoom() {
     messageList.textContent = null;
     socket.emit("leave", roomName, nickname);
 }
+function handleJoinFromRoomList(event) {
+  const currentListRoomName = event.target.nextElementSibling.innerText;
+  roomNameInput.value = currentListRoomName;
+  handleSearchedRoomJoin();
+}
+function closeNoticePanel() {
+  notice.remove();
+}
 
 // Listen to events. (Frontend)
 createBtn.addEventListener("click", handleRoomCreation);
-joinBtn.addEventListener("click", handleRoomJoin);
+searchJoinBtn.addEventListener("click", handleSearchedRoomJoin);
 roomForm.addEventListener("submit", handleChatMessage);
 nicknameInputs.forEach((el) => {
   el.addEventListener("input", syncNickname);
 });
 leaveBtn.addEventListener("click", leaveRoom);
+closeBtn.addEventListener("click", closeNoticePanel);
 
 // Listen to events. (From server)
 socket.on("welcome", (payload, participants) => {
-  // Does not invoke on the same sids at the first time.
+  // Does not invoke on the same sids
   updateUsersCount(participants);
   echoJoinMsg(payload.message);
 });
@@ -91,12 +104,17 @@ socket.on("farewell", (payload, participants) => {
   updateUsersCount(participants);
   echoJoinMsg(payload.message);
 });
+socket.on("leave", (payload, participants) => {
+  echoJoinMsg(payload.message);
+  updateUsersCount(participants);
+});
 socket.on("roomUpdate", (rooms) => {
   const subtitle = welcomeDOM.querySelector("h4");
   subtitle.innerText = `Available rooms: ${rooms.length}`;
   roomList.textContent = null;
-  rooms.forEach((room) => {
-    updateRooms(room);
+
+  rooms.forEach((roomName) => {
+    updateRooms(roomName);
   });
 });
 socket.on("roomNotFound", (roomName) => {
@@ -112,7 +130,7 @@ socket.on("roomExist", (roomName) => {
 let roomName;
 let nickname;
 
-function showRoom() {
+function showRoom(participants) {
   // Hide welcome div.
   welcomeDOM.removeAttribute("class");
   roomNameInput.value = "";
@@ -124,7 +142,14 @@ function showRoom() {
   room.classList.add("active");
   const roomH2 = room.querySelector("h2");
   roomH2.innerHTML = roomName.trim().length !== 0 ? `In Room : ${roomName}` : 'In Room'
-  
+
+  // Update number of participants & show an initial message.
+  if(participants) {
+    updateUsersCount(participants);
+
+    const message = `【SYSTEM】 You've joined the chat.`
+    echoJoinMsg(message);
+  }
 }
 
 function addMessage(payload, writtenByMe) {
@@ -157,14 +182,24 @@ function createTimestamp() {
   return timeLine;
 }
 
-function updateRooms(room) {
+function updateRooms(roomNameFromList) {
   const roomLine = document.createElement("li");
-  roomLine.innerText = room;
+  const roomNameSpan = document.createElement("span");
+  const roomJoinBtn = document.createElement("button");
+
+  roomNameSpan.classList.add("roomName");
+  roomNameSpan.innerText = roomNameFromList;
+
+  roomJoinBtn.classList.add("roomJoin");
+  roomJoinBtn.innerText = "Join";
+  roomJoinBtn.addEventListener('click', handleJoinFromRoomList, roomNameFromList);
+
+  roomLine.append(roomJoinBtn);
+  roomLine.append(roomNameSpan);
   roomList.appendChild(roomLine);
 }
 
 function updateUsersCount(participants) {
-  console.log(participants);
   userCount.innerHTML = `In Room : ${roomName} (${participants})`;
 }
 
