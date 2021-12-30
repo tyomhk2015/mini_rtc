@@ -19,10 +19,10 @@ html(lang="en")
           span Nickname
           input#topNickname(type="text", placeholder="Enter nickname", required)
           span Room
-          input#roomName(type="text", placeholder="Enter a room name", required)
+          input#roomName(type="text", placeholder="Enter the room name you want to create / join.", required)
           div.btnWrapper
             button.create(type="button") Create
-            button.join(type="button") Join
+            button.searchJoin(type="button") Join
       div#room
         h2 In Room
         ul#messageList
@@ -34,6 +34,19 @@ html(lang="en")
           div.btnWrapper
             button(type="submit") Enter
             button.leave(type="button") Leave
-    <!-- Loading socket.io and frontend JS -->
+      div#notice
+        div#noticeHeader
+          h3 A list of implementations.
+          h4 'Code Challenge' requirements.
+          div.closeBtn ❌
+        ul 
+          li Users should be able to create, join and leave rooms. 
+            input(type="checkbox" checked="true")
+          li Allow users to change nickname. 
+            input(type="checkbox" checked="true")
+          li Backend code on src/server.js, and frontend code on src/public/app.js 
+            input(type="checkbox" checked="true")
+          li Show a list of all the rooms currently on the server.
+            input(type="checkbox" checked="true")
     script(src="/socket.io/socket.io.js")
     script(src="/public/js/app_socketIO.js")
