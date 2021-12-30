@@ -49,9 +49,11 @@ socketIOserver.on("connection", (socket) => {
     // Server has a private room ready for server and a client as default, id.
     // The room names after the id is other rooms that the client is currently participating.
     socket.join(payload.room_name); // Join a room the client has entered in the form.
+    done(countParticipants(payload.room_name));
 
-    // console.log(socket.rooms); // Check the participating rooms.
-    done();
+    // Tell the people in the room that this new client has joined the room.
+    const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${payload.nickname} joined the room, ${payload.room_name}.`}
+    socket.to(payload.room_name).emit("welcome", sendingPayload, countParticipants(payload.room_name));
     
     // Notify all sockets that a new room has been created.
     socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
@@ -66,7 +68,7 @@ socketIOserver.on("connection", (socket) => {
     }
     socket["nickname"] = payload.nickname;
     socket.join(payload.room_name);
-    done();
+    done(countParticipants(payload.room_name));
     // Tell the people in the room that this new client has joined the room.
     const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${payload.nickname} joined the room, ${payload.room_name}.`}
     socket.to(payload.room_name).emit("welcome", sendingPayload, countParticipants(payload.room_name));
@@ -83,7 +85,8 @@ socketIOserver.on("connection", (socket) => {
   // Leave the room
   socket.on("leave", (roomName, nickname) => {
     socket["nickname"] = nickname;
-    console.log(socket.id, 'left the room,',roomName);
+    const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${socket.nickname} left the chat.`};
+    socket.to(roomName).emit("leave", sendingPayload, countParticipants(roomName) - 1);
     socket.leave(roomName);
     socketIOserver.sockets.emit("roomUpdate", showPublicRooms());
   });
@@ -93,6 +96,7 @@ socketIOserver.on("connection", (socket) => {
     const sendingPayload = {nickname: socket.nickname, message: `【SYSTEM】 ${socket.nickname} left the chat.`};
     socket.rooms.forEach((roomID) => {
       socket.to(roomID).emit("farewell", sendingPayload, countParticipants(roomID) - 1);
+      socket.leave(roomID);
     });
   });
 
