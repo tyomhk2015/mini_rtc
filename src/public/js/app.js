@@ -41,6 +41,7 @@ let roomName;
 
 // Variable related to P2P
 let myPeerConnection;
+let myDataChannel;
 
 // Event Handlers
 muteBtn.addEventListener('click', handleMuteBtn);
@@ -52,6 +53,10 @@ welcomeForm.addEventListener('submit', switchContent);
 // The logic for Peer A, the creator of the room, or the old members dwelling in the room.
 socket.on("greeting", async (msg) => {
   console.log(msg);
+  myDataChannel = myPeerConnection.createDataChannel("chat");
+  myDataChannel.addEventListener("open", (event) => console.log("Peer A : Data channel is opened!"));
+  myDataChannel.addEventListener("message", (event) => console.log("Peer A: Incoming Message: ", event.data));
+
   const offer = await myPeerConnection.createOffer(); // https://huchu.link/1vcRLgS
   myPeerConnection.setLocalDescription(offer); // https://huchu.link/ryOuwR4
   console.log("🏠 Peer A: The offer has been sent to the server.");
@@ -63,6 +68,11 @@ socket.on("answer", (answer) => {
 });
 // The logic for Peer B, the new participant of the room.
 socket.on("offer", async (offer) => {
+  myPeerConnection.addEventListener("datachannel", (event) => {
+    myDataChannel = event.channel;
+    myDataChannel.addEventListener("open", () => console.log("Peer B : Data channel is opened!"));
+    myDataChannel.addEventListener("message", (event) => console.log("Peer B: Incoming Message: ", event.data));
+  });
   console.log("🙋‍♂️🙋‍♀️ Peer B: Got the offer from the server.");
   myPeerConnection.setRemoteDescription(offer); // https://huchu.link/uIobtS0
   const answer = await myPeerConnection.createAnswer();
@@ -161,10 +171,36 @@ async function initiateStream() {
   makeConnection(); // RTC code.
 }
 
+function addMessage(payload, writtenByMe) {
+  const timeStampDOM = createTimestamp();
+  const messageLine = document.createElement("li");
+  let msg = `${payload.nickname}: ${payload.message}`;
+  if(writtenByMe){
+    msg = `(You)`.concat(' ', msg);
+    messageLine.classList.add("mine");
+  }
+  messageLine.innerText = msg;
+  messageLine.append(timeStampDOM);
+  messageList.appendChild(messageLine);
+}
+
 // RTC Connection.
 function makeConnection() {
   // Make P2P Connection (Peer A and Peer B)
-  myPeerConnection = new RTCPeerConnection(); // https://huchu.link/3AChPBY
+  myPeerConnection = new RTCPeerConnection({
+    // TEST done w/ my friends.
+    iceServers : [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ],
+      },
+    ],
+  }); // https://huchu.link/3AChPBY
   myPeerConnection.addEventListener('icecandidate', handleICE);
   myPeerConnection.addEventListener('track', handleAddStream);
   stream.getTracks().forEach((track) => {
