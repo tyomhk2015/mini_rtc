@@ -105,3 +105,24 @@ In FireFox:
 
 * Added the event listener `track`, instead of `addstream`, on the `RTCPeerConnection` object.
 * In the `srcObject` of video tag DOM, put `Mediastream`.
+
+
+💡 **STUN server**
+
+<br>📝 Resource : <a href="https://help.singlecomm.com/hc/en-us/articles/115007993947-STUN-servers-A-Quick-Start-Guide">What is a STUN Server?</a>
+
+* (Over simplified) A server telling other clients what the other clients' public IP addresses are, for the purpose of connecting the clients together.
+
+* The webRTC, that worked on local network, will not work on the internet unless you setup or use a STUN server.
+
+🔥 **Cons of WebRTC**
+
+* As the number of peers increase, the burden that the computer or node has to tolerate gets heavier.
+
+<img src="https://thenewdialtone.com/wp-content/uploads/2016/04/Complex-Full-Mesh-Video-Conferencing.jpg">
+
+* To relieve the problem, there are other architectures that other services are using.
+
+<img src="https://chrisuehlinger.com/static/9ad7bc3ad96c8e36d8e958d6511e131d/38aa5/mesh-vs-sfu.png">
+
+* Sending other than video and audio tracks, which is expensive process, using <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels">Data Channels</a> can reduce the burden of sending data between peers.
