@@ -12,6 +12,11 @@ const welcome = document.getElementById('welcome');
 const welcomeForm = welcome.querySelector('form');
 const streamWrapper = document.getElementById('streamWrapper');
 const peerStream = document.getElementById('peerStream');
+const messageList = document.getElementById('messageList');
+
+const messageForm = document.getElementById('messageForm');
+const messageInput = messageForm.querySelector("#message")
+const roomNicknameInput = messageForm.querySelector('#roomNickname');
 
 
 scene.volume = 0.2;
@@ -48,6 +53,7 @@ muteBtn.addEventListener('click', handleMuteBtn);
 cameraBtn.addEventListener('click', handleCameraBtn);
 camerasSelect.addEventListener('change', handleCameraChange);
 welcomeForm.addEventListener('submit', switchContent);
+messageForm.addEventListener('submit', handleSendingMessage);
 
 // Handle events from the server.
 // The logic for Peer A, the creator of the room, or the old members dwelling in the room.
@@ -55,7 +61,11 @@ socket.on("greeting", async (msg) => {
   console.log(msg);
   myDataChannel = myPeerConnection.createDataChannel("chat");
   myDataChannel.addEventListener("open", (event) => console.log("Peer A : Data channel is opened!"));
-  myDataChannel.addEventListener("message", (event) => console.log("Peer A: Incoming Message: ", event.data));
+  myDataChannel.addEventListener("message", (event) => {
+    const chatObj = JSON.parse(event.data);
+    addMessage(chatObj);
+    console.log(event);
+  });
 
   const offer = await myPeerConnection.createOffer(); // https://huchu.link/1vcRLgS
   myPeerConnection.setLocalDescription(offer); // https://huchu.link/ryOuwR4
@@ -71,7 +81,11 @@ socket.on("offer", async (offer) => {
   myPeerConnection.addEventListener("datachannel", (event) => {
     myDataChannel = event.channel;
     myDataChannel.addEventListener("open", () => console.log("Peer B : Data channel is opened!"));
-    myDataChannel.addEventListener("message", (event) => console.log("Peer B: Incoming Message: ", event.data));
+    myDataChannel.addEventListener("message", (event) => {
+      const chatObj = JSON.parse(event.data);
+      addMessage(chatObj);
+      console.log(event);
+    });
   });
   console.log("🙋‍♂️🙋‍♀️ Peer B: Got the offer from the server.");
   myPeerConnection.setRemoteDescription(offer); // https://huchu.link/uIobtS0
@@ -113,6 +127,17 @@ async function handleCameraChange() {
   // Sync mic mute & camera on setting.
   toggleMic(); 
   toggleCamera(); 
+}
+
+function handleSendingMessage(event) {
+  event.preventDefault();
+  const msg = messageInput.value.trim();
+  if(msg.length === 0) return;
+  const chatObj = {nickname: roomNicknameInput.value, message: msg};
+  const chatJSON = JSON.stringify({nickname: roomNicknameInput.value, message: msg});
+  myDataChannel.send(chatJSON);
+  addMessage(chatObj, true);
+  messageInput.value = "";
 }
 
 function toggleMic() {
@@ -182,6 +207,15 @@ function addMessage(payload, writtenByMe) {
   messageLine.innerText = msg;
   messageLine.append(timeStampDOM);
   messageList.appendChild(messageLine);
+}
+
+function createTimestamp() {
+  const timeLine = document.createElement('small');
+  const date = new Date();
+  const hours =  date.getHours();
+  const minutes = date.getMinutes();
+  timeLine.innerText = `    ${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
+  return timeLine;
 }
 
 // RTC Connection.
